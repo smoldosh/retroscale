@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetroScale — Emulation Display Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <h1 class="header-title">RETROSCALE</h1>
+    <p class="header-sub">EMULATION DISPLAY VISUALIZER</p>
+  </header>
+
+  <main>
+
+    <!-- ── Controls ───────────────────────────────────────────────────── -->
+    <aside class="controls">
+
+      <!-- Device -->
+      <div class="panel">
+        <h2 class="panel-title">▸ DEVICE</h2>
+
+        <div class="field inputs-pair">
+          <div class="input-unit">
+            <label class="field-label" for="deviceW">W (px)</label>
+            <input type="number" id="deviceW" value="640" min="1" max="9999">
+          </div>
+          <div class="input-unit">
+            <label class="field-label" for="deviceH">H (px)</label>
+            <input type="number" id="deviceH" value="480" min="1" max="9999">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="deviceInch">DIAGONAL (inches)</label>
+          <input type="number" id="deviceInch" value="" min="0.1" max="200" step="0.1" placeholder="—">
+        </div>
+      </div>
+
+      <!-- Console -->
+      <div class="panel">
+        <h2 class="panel-title">▸ CONSOLE</h2>
+
+        <div class="field">
+          <label class="field-label" for="consoleSelect">SYSTEM</label>
+          <select id="consoleSelect"></select>
+        </div>
+
+        <!-- CRT toggle — hidden unless console has hasCRT -->
+        <div class="field" id="crtField" style="display:none;">
+          <span class="field-label">CRT ASPECT (4:3)</span>
+          <div class="toggle-row">
+            <label class="toggle" for="crtMode">
+              <input type="checkbox" id="crtMode">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-state" id="crtModeState">OFF</span>
+          </div>
+          <p class="crt-note" id="crtNote"></p>
+        </div>
+      </div>
+
+      <!-- Scaling -->
+      <div class="panel">
+        <h2 class="panel-title">▸ SCALING</h2>
+
+        <div class="field">
+          <div class="toggles-side-by-side">
+            <div class="toggle-pair">
+              <span class="field-label">INTEGER</span>
+              <div class="toggle-row">
+                <label class="toggle" for="integerScaling">
+                  <input type="checkbox" id="integerScaling">
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-state" id="integerScalingState">OFF</span>
+              </div>
+            </div>
+            <div class="toggle-pair" id="overscaleField">
+              <span class="field-label">OVER</span>
+              <div class="toggle-row">
+                <label class="toggle" for="overscaling">
+                  <input type="checkbox" id="overscaling">
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-state" id="overscalingState">OFF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">VISUALIZATION ZOOM</span>
+          <div class="slider-row">
+            <input type="range" id="vizScale" min="0.2" max="4" step="0.1" value="1">
+            <span class="slider-val" id="vizScaleVal">1.0×</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="panel">
+        <h2 class="panel-title">▸ INFO</h2>
+
+        <div class="info-row">
+          <span class="info-key">CONSOLE</span>
+          <span class="info-value" id="infoCon">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">SCALE</span>
+          <span class="info-value" id="infoScale">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">OUTPUT</span>
+          <span class="info-value" id="infoFinal">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">COVERAGE</span>
+          <span class="info-value" id="infoCoverage">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">BARS W/H</span>
+          <span class="info-value" id="infoLeftover">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">PPI</span>
+          <span class="info-value" id="infoPPI">—</span>
+        </div>
+
+        <!-- Overscale rows — shown only when overscale preview is active -->
+        <div class="info-row" id="overscaleRow" style="display:none;">
+          <span class="info-key">OVERSCALE</span>
+          <span class="info-value" id="infoOverscale">—</span>
+          <span class="info-key" style="margin-left:4px;">CUT W/H</span>
+          <span class="info-value warning" id="infoOverscaleCut">—</span>
+        </div>
+
+        <div class="info-warning" id="infoWarning"></div>
+      </div>
+
+      <!-- Themes -->
+      <div class="panel">
+        <h2 class="panel-title">▸ THEMES</h2>
+        <div class="theme-buttons">
+          <button class="theme-btn active" data-theme="default">DARK</button>
+          <button class="theme-btn" data-theme="light">LIGHT</button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── Visualization ───────────────────────────────────────────────── -->
+    <section class="visualization">
+      <div class="canvas-wrap" id="canvasContainer">
+        <canvas id="vizCanvas"></canvas>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-swatch device"></div>
+          <span>DEVICE SCREEN</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch console"></div>
+          <span>CONSOLE OUTPUT</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch bars"></div>
+          <span>UNUSED AREA</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>CREATED BY <a href="mailto:smoldosh@gmail.com">Smoldosh</a>· BUILT WITH CLAUDE CODE</span>
+  </footer>
+
+  <script src="js/consoles.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

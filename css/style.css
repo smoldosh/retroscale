@@ -1,0 +1,489 @@
+/* ── Google Font: Press Start 2P ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* ── Variables ──────────────────────────────────────────────────────────── */
+:root {
+  --bg:           #0d0d1a;
+  --bg-panel:     #101025;
+  --bg-deep:      #07071a;
+  --border:       #252550;
+  --border-hi:    #3a3a7a;
+  --green:        #00ff41;
+  --green-dim:    #005515;
+  --orange:       #ff6b35;
+  --cyan:         #00e5ff;
+  --purple:       #c792ea;
+  --blue:         #4444aa;
+  --text:         #b0b0cc;
+  --text-dim:     #55557a;
+  --warning:      #ff2222;
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+html {
+  font-size: 62.5%; /* 1rem = 10px */
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 1rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+header {
+  text-align: center;
+  padding: 2rem 1.6rem 1.6rem;
+  border-bottom: 2px solid var(--border);
+  background: linear-gradient(180deg, #050512 0%, var(--bg) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.15) 3px,
+    rgba(0,0,0,0.15) 4px
+  );
+  pointer-events: none;
+}
+
+.header-title {
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  color: var(--green);
+  text-shadow: 0 0 8px var(--green), 0 0 20px var(--green), 0 0 40px #005500;
+  letter-spacing: 0.6rem;
+  padding-left: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.header-sub {
+  font-size: clamp(0.6rem, 1.5vw, 0.9rem);
+  color: var(--cyan);
+  letter-spacing: 0.3rem;
+  padding-left: 0.3rem;
+  opacity: 0.8;
+}
+
+/* ── Main layout ─────────────────────────────────────────────────────────── */
+main {
+  display: flex;
+  gap: 1.4rem;
+  padding: 1.4rem;
+  flex: 1;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Controls column ────────────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 270px;
+  flex-shrink: 0;
+}
+
+/* ── Panel ──────────────────────────────────────────────────────────────── */
+.panel {
+  background: var(--bg-panel);
+  border: 2px solid var(--border);
+  padding: 1.2rem;
+}
+
+.panel-title {
+  font-size: 0.8rem;
+  color: var(--green);
+  letter-spacing: 0.2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.8rem;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 0 6px var(--green);
+}
+
+/* ── Field ──────────────────────────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.field:last-child { margin-bottom: 0; }
+
+.field-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1rem;
+}
+
+.field input[type="number"],
+.field select {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-hi);
+  color: var(--cyan);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  padding: 0.7rem 0.8rem;
+  outline: none;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+.field input[type="number"]:focus,
+.field select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green-dim);
+}
+
+.field select option      { background: #0d0d1a; }
+.field select optgroup    { color: var(--text-dim); font-size: 0.8rem; }
+
+/* ── Toggle ─────────────────────────────────────────────────────────────── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 4.4rem;
+  height: 2.2rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-deep);
+  border: 2px solid var(--border-hi);
+  transition: border-color 0.12s;
+}
+
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  left: 0.3rem;
+  top: 0.3rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  background: var(--text-dim);
+  transition: left 0.12s, background 0.12s;
+}
+
+.toggle input:checked + .toggle-slider {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+
+.toggle input:checked + .toggle-slider::after {
+  left: 2.4rem;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+
+.toggle-state {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  min-width: 2.4rem;
+}
+
+.toggle input:checked ~ .toggle-state,
+.field input:checked + * + .toggle-state {
+  color: var(--green);
+}
+
+/* ── Side-by-side inputs ─────────────────────────────────────────────────── */
+.inputs-pair {
+  display: flex;
+  gap: 1rem;
+}
+
+.input-unit {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Side-by-side toggles ────────────────────────────────────────────────── */
+.toggles-side-by-side {
+  display: flex;
+  gap: 2rem;
+}
+
+.toggle-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toggle-pair.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* ── Range slider ───────────────────────────────────────────────────────── */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.slider-val {
+  font-size: 0.9rem;
+  color: var(--cyan);
+  min-width: 3.2rem;
+  text-align: right;
+}
+
+/* ── CRT note ───────────────────────────────────────────────────────────── */
+.crt-note {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+  margin-top: 0.2rem;
+}
+
+/* ── Info panel ─────────────────────────────────────────────────────────── */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  gap: 0.8rem;
+}
+
+.info-row:last-child { border-bottom: none; }
+
+.info-row .info-key   { color: var(--text-dim); flex-shrink: 0; }
+.info-row .info-value { color: var(--cyan); text-align: right; }
+
+.warning { color: var(--warning) !important; text-shadow: 0 0 6px var(--warning); }
+
+.info-warning {
+  display: none;
+  margin-top: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255,34,34,0.08);
+  border: 1px solid var(--warning);
+  color: var(--warning);
+  font-size: 0.7rem;
+  text-align: center;
+  letter-spacing: 0.1rem;
+}
+
+/* ── Visualization column ────────────────────────────────────────────────── */
+.visualization {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.canvas-wrap {
+  background: var(--bg-deep);
+  border: 2px solid var(--border);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 360px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* CRT vignette effect on canvas container */
+.canvas-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+}
+
+#vizCanvas {
+  image-rendering: pixelated;
+  display: block;
+  max-width: 100%;
+}
+
+/* ── Legend ──────────────────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  padding: 0 0.4rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.legend-swatch {
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 1px solid currentColor;
+  flex-shrink: 0;
+}
+
+.legend-swatch.device  { background: rgba(68,68,170,0.4); border-color: var(--blue); }
+.legend-swatch.console { background: rgba(255,107,53,0.3); border-color: var(--orange); }
+.legend-swatch.bars    { background: rgba(0,0,0,0.5); border-color: var(--text-dim); }
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  letter-spacing: 0.2rem;
+}
+
+footer a {
+  color: var(--green);
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Theme: Light (světlá verze defaultu) ───────────────────────────────── */
+html[data-theme="light"] {
+  --bg:        #eeeeff;
+  --bg-panel:  #f8f8ff;
+  --bg-deep:   #e8e8f8;
+  --border:    #c0c0e0;
+  --border-hi: #9090c0;
+  --green:     #226622;
+  --green-dim: #d0f0d0;
+  --orange:    #cc4400;
+  --cyan:      #005588;
+  --blue:      #4444aa;
+  --text:      #1a1a3a;
+  --text-dim:  #6666aa;
+  --warning:   #cc0000;
+}
+
+html[data-theme="light"] header {
+  background: linear-gradient(180deg, #dcdcf8 0%, #eeeeff 100%);
+  border-bottom-color: #9090c0;
+}
+
+html[data-theme="light"] .header-title {
+  color: #226622;
+  text-shadow: 0 0 6px rgba(34,102,34,0.3);
+}
+
+html[data-theme="light"] .header-sub {
+  color: #4444aa;
+}
+
+/* ── Theme panel buttons ─────────────────────────────────────────────────── */
+.theme-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.theme-btn {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-hi);
+  color: var(--text-dim);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  letter-spacing: 0.1rem;
+  border-radius: 0;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.theme-btn::before {
+  content: '○ ';
+}
+
+.theme-btn:hover {
+  border-color: var(--green);
+  color: var(--text);
+}
+
+.theme-btn.active {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-dim);
+}
+
+.theme-btn.active::before {
+  content: '● ';
+}
+
+/* ── Overscale info row layout ───────────────────────────────────────────── */
+#overscaleRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: space-between;
+}
+
+#overscaleRow .info-key   { font-size: 0.7rem; }
+#overscaleRow .info-value { font-size: 0.8rem; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 780px) {
+  main {
+    flex-direction: column;
+  }
+  .controls {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .controls .panel {
+    flex: 1;
+    min-width: 200px;
+  }
+}
