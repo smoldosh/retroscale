@@ -1,4 +1,4 @@
-Screenshot# RetroScale
+# RetroScale
 
 A browser-based visualizer for emulation display scaling. Pick a retro console and a target device resolution — see how the output fills the screen, with or without integer scaling.
 
