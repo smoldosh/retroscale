@@ -3,14 +3,14 @@ const THEMES = {
   default: {
     labelBg:        'rgba(0,0,0,0.65)',
     bgOuter:        '#07071a',
-    bgDevice:       '#07071a',
+    bgDevice:       '#13132e',
     gridColor:      '#111130',
     deviceBorder:   '#3a3aaa',
     consoleFill:    'rgba(255,107,53,0.12)',
     consoleBorder:  '#ff6b35',
     consoleLabel:   '#ff9966',
     deviceLabel:    '#5555bb',
-    bars:           'rgba(0,0,0,0.45)',
+    bars:           'rgba(0,0,0,0.25)',
     scanlines:      'rgba(0,0,0,0.18)',
     cornerMark:     '#ffaa44',
     overflowFill:   'rgba(220,30,30,0.28)',
@@ -37,7 +37,6 @@ const THEMES = {
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const deviceWInput       = document.getElementById("deviceW");
 const deviceHInput       = document.getElementById("deviceH");
-const deviceInchInput    = document.getElementById("deviceInch");
 const consoleSelect      = document.getElementById("consoleSelect");
 const integerScalingChk  = document.getElementById("integerScaling");
 const integerScalingLbl  = document.getElementById("integerScalingState");
@@ -58,18 +57,19 @@ const infoConEl          = document.getElementById("infoCon");
 const infoScaleEl        = document.getElementById("infoScale");
 const infoFinalEl        = document.getElementById("infoFinal");
 const infoCoverageEl     = document.getElementById("infoCoverage");
-const infoLeftoverEl     = document.getElementById("infoLeftover");
-const infoPPIEl          = document.getElementById("infoPPI");
-const infoWarningEl      = document.getElementById("infoWarning");
-const infoOverscaleRow   = document.getElementById("overscaleRow");
-const infoOverscaleEl    = document.getElementById("infoOverscale");
-const infoOverscaleCutEl = document.getElementById("infoOverscaleCut");
+const infoLeftoverEl        = document.getElementById("infoLeftover");
+const infoWarningEl         = document.getElementById("infoWarning");
+const infoOverscaleRow      = document.getElementById("overscaleRow");
+const infoOverscaleCutRow   = document.getElementById("overscaleCutRow");
+const infoOverscaleNativeRow = document.getElementById("overscaleNativeRow");
+const infoOverscaleEl       = document.getElementById("infoOverscale");
+const infoOverscaleCutEl    = document.getElementById("infoOverscaleCut");
+const infoOverscaleNativeEl = document.getElementById("infoOverscaleNative");
 
 // ── State ─────────────────────────────────────────────────────────────────
 const state = {
   deviceW: 640,
   deviceH: 480,
-  deviceInch: null,
   consoleId: "nes",
   integerScaling: false,
   overscaling: false,
@@ -210,8 +210,6 @@ function draw() {
     // Outer background (outside device)
     ctx.fillStyle = tc.bgOuter;
     ctx.fillRect(0, 0, cW, cH);
-    ctx.fillStyle = 'rgba(0,0,0,0.52)';
-    ctx.fillRect(0, 0, cW, cH);
 
     // Device background
     ctx.fillStyle = tc.bgDevice;
@@ -253,12 +251,6 @@ function draw() {
     ctx.lineWidth = 2;
     ctx.strokeRect(dX, dY, devVizW, devVizH);
 
-    // Labels
-    if (ovVizW > 50) {
-      ctx.font = `${fontSize}px 'Press Start 2P', monospace`;
-      drawLabel(ctx, `${overConW}×${overConH} [${overScale}x]`, ovX + 5, ovY + fontSize + 3, fontSize, tc.overflowBorder, tc.labelBg);
-    }
-
     // Info panel
     const normalFW = conW * intScale;
     const normalFH = conH * intScale;
@@ -269,17 +261,21 @@ function draw() {
     infoFinalEl.textContent    = `${normalFW}×${normalFH}`;
     infoCoverageEl.textContent = `${coverage.toFixed(1)}%`;
     infoLeftoverEl.textContent = `${devW - normalFW} / ${devH - normalFH} px`;
-    updatePPI(devW, devH);
     infoScaleEl.classList.remove("warning");
     infoWarningEl.style.display = "none";
-    infoOverscaleRow.style.display   = "";
-    infoOverscaleEl.textContent      = `${overScale}x`;
-    infoOverscaleCutEl.textContent   = `${cutW} / ${cutH} px`;
+    infoOverscaleRow.style.display       = "";
+    infoOverscaleCutRow.style.display    = "";
+    infoOverscaleNativeRow.style.display = "";
+    infoOverscaleEl.textContent          = `${overScale}x`;
+    infoOverscaleCutEl.textContent       = `${cutW} / ${cutH} px`;
+    infoOverscaleNativeEl.textContent    = `${Math.round(cutW / overScale)} / ${Math.round(cutH / overScale)} px`;
     return;
   }
 
   // ── Normal draw ───────────────────────────────────────────────────────────
-  infoOverscaleRow.style.display = "none";
+  infoOverscaleRow.style.display       = "none";
+  infoOverscaleCutRow.style.display    = "none";
+  infoOverscaleNativeRow.style.display = "none";
 
   canvas.width  = devVizW;
   canvas.height = devVizH;
@@ -290,12 +286,14 @@ function draw() {
   drawDotGrid(ctx, 0, 0, devVizW, devVizH, gridStep, tc.gridColor);
 
   // Scale
-  const emuScale = state.integerScaling
+  let emuScale = state.integerScaling
     ? calcIntScale(devW, devH, conW, conH)
     : calcMaxFill(devW, devH, conW, conH);
 
-  const isUnscalable = state.integerScaling && emuScale === 1 &&
-                       (conW > devW || conH > devH);
+  const isUnscalable = state.integerScaling && (conW > devW || conH > devH);
+  if (isUnscalable) {
+    emuScale = calcMaxFill(devW, devH, conW, conH);
+  }
 
   const scaledConW = conW * emuScale * vizScale;
   const scaledConH = conH * emuScale * vizScale;
@@ -324,14 +322,8 @@ function draw() {
   ctx.lineWidth = 2;
   ctx.strokeRect(1, 1, devVizW - 2, devVizH - 2);
 
-  // Labels
   const finalW = Math.round(scaledConW / vizScale);
   const finalH = Math.round(scaledConH / vizScale);
-  if (scaledConW > 40 && scaledConH > 20) {
-    const labelColor = isUnscalable ? '#ff4444' : tc.consoleLabel;
-    ctx.font = `${fontSize}px 'Press Start 2P', monospace`;
-    drawLabel(ctx, `${finalW}×${finalH}`, conX + 4, conY + fontSize + 3, fontSize, labelColor, tc.labelBg);
-  }
 
   // Info panel
   const maxFill   = calcMaxFill(devW, devH, conW, conH);
@@ -342,30 +334,10 @@ function draw() {
   infoFinalEl.textContent    = `${finalW}×${finalH}`;
   infoCoverageEl.textContent = `${coverage.toFixed(1)}%`;
   infoLeftoverEl.textContent = `${devW - finalW} / ${devH - finalH} px`;
-  updatePPI(devW, devH);
 
   infoScaleEl.classList.toggle("warning", isUnscalable);
 
-  if (isUnscalable) {
-    infoWarningEl.textContent = "! CONSOLE > DEVICE";
-    infoWarningEl.style.display = "block";
-  } else if (state.integerScaling && emuScale === 1) {
-    infoWarningEl.textContent = "! MIN SCALE (1x)";
-    infoWarningEl.style.display = "block";
-  } else {
-    infoWarningEl.style.display = "none";
-  }
-}
-
-// ── PPI ───────────────────────────────────────────────────────────────────
-function updatePPI(devW, devH) {
-  if (state.deviceInch && state.deviceInch > 0) {
-    const diagPx  = Math.sqrt(devW * devW + devH * devH);
-    const ppi     = diagPx / state.deviceInch;
-    infoPPIEl.textContent = `${Math.round(ppi)} px/in`;
-  } else {
-    infoPPIEl.textContent = "—";
-  }
+  infoWarningEl.style.display = "none";
 }
 
 // ── Dropdown init ─────────────────────────────────────────────────────────
@@ -434,12 +406,6 @@ deviceHInput.addEventListener("input", () => {
   draw();
 });
 
-deviceInchInput.addEventListener("input", () => {
-  const v = parseFloat(deviceInchInput.value);
-  state.deviceInch = v > 0 ? v : null;
-  draw();
-});
-
 consoleSelect.addEventListener("change", () => {
   state.consoleId = consoleSelect.value;
   updateCRTField();
@@ -499,5 +465,20 @@ initThemes();
     draw();
   });
 })();
+
+// ── Help modal ────────────────────────────────────────────────────────────
+const helpModal = document.getElementById("helpModal");
+document.getElementById("helpBtn").addEventListener("click", () => {
+  helpModal.classList.add("open");
+});
+document.getElementById("helpClose").addEventListener("click", () => {
+  helpModal.classList.remove("open");
+});
+helpModal.addEventListener("click", e => {
+  if (e.target === helpModal) helpModal.classList.remove("open");
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") helpModal.classList.remove("open");
+});
 
 document.fonts.ready.then(draw);

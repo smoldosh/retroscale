@@ -50,7 +50,9 @@ const CONSOLES = [
     name: "PC Engine / TurboGrafx-16",
     category: "TV Consoles",
     displayW: 256, displayH: 240,
-    hasCRT: false
+    crtDisplayW: 320, crtDisplayH: 240,
+    hasCRT: true,
+    note: "Native 8:7 PAR → CRT stretches to 4:3 (320×240)"
   },
   {
     id: "neogeo",
@@ -252,6 +254,48 @@ const CONSOLES = [
     category: "Computers",
     displayW: 320, displayH: 200,
     hasCRT: false
+  },
+
+  // ── Modern Consoles (Early Emulation) ────────────────────────────────────
+  {
+    id: "xbox",
+    name: "Xbox (Original)",
+    category: "Modern Consoles",
+    displayW: 640, displayH: 480,
+    hasCRT: false,
+    note: "Most games render at 480p (640×480)"
+  },
+  {
+    id: "xbox360",
+    name: "Xbox 360",
+    category: "Modern Consoles",
+    displayW: 1280, displayH: 720,
+    hasCRT: false,
+    note: "Standard 720p output; some titles at 1080p"
+  },
+  {
+    id: "ps3",
+    name: "PlayStation 3",
+    category: "Modern Consoles",
+    displayW: 1280, displayH: 720,
+    hasCRT: false,
+    note: "Most games target 720p; select titles at 1080p"
+  },
+  {
+    id: "switch_handheld",
+    name: "Nintendo Switch (handheld)",
+    category: "Modern Consoles",
+    displayW: 1280, displayH: 720,
+    hasCRT: false,
+    note: "720p handheld screen; games often render lower and upscale"
+  },
+  {
+    id: "switch_docked",
+    name: "Nintendo Switch (docked)",
+    category: "Modern Consoles",
+    displayW: 1920, displayH: 1080,
+    hasCRT: false,
+    note: "1080p docked output; games often render at 720p–900p"
   },
 
   // ── Fantasy Consoles ──────────────────────────────────────────────────────

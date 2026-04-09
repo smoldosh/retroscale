@@ -23,7 +23,7 @@
 
       <!-- Device -->
       <div class="panel">
-        <h2 class="panel-title">▸ DEVICE</h2>
+        <h2 class="panel-title">EMULATION DEVICE</h2>
 
         <div class="field inputs-pair">
           <div class="input-unit">
@@ -35,16 +35,11 @@
             <input type="number" id="deviceH" value="480" min="1" max="9999">
           </div>
         </div>
-
-        <div class="field">
-          <label class="field-label" for="deviceInch">DIAGONAL (inches)</label>
-          <input type="number" id="deviceInch" value="" min="0.1" max="200" step="0.1" placeholder="—">
-        </div>
       </div>
 
       <!-- Console -->
       <div class="panel">
-        <h2 class="panel-title">▸ CONSOLE</h2>
+        <h2 class="panel-title">EMULATED CONSOLE</h2>
 
         <div class="field">
           <label class="field-label" for="consoleSelect">SYSTEM</label>
@@ -67,7 +62,7 @@
 
       <!-- Scaling -->
       <div class="panel">
-        <h2 class="panel-title">▸ SCALING</h2>
+        <h2 class="panel-title">SCALING</h2>
 
         <div class="field">
           <div class="toggles-side-by-side">
@@ -105,7 +100,7 @@
 
       <!-- Info -->
       <div class="panel">
-        <h2 class="panel-title">▸ INFO</h2>
+        <h2 class="panel-title">INFO</h2>
 
         <div class="info-row">
           <span class="info-key">CONSOLE</span>
@@ -127,17 +122,19 @@
           <span class="info-key">BARS W/H</span>
           <span class="info-value" id="infoLeftover">—</span>
         </div>
-        <div class="info-row">
-          <span class="info-key">PPI</span>
-          <span class="info-value" id="infoPPI">—</span>
-        </div>
 
         <!-- Overscale rows — shown only when overscale preview is active -->
         <div class="info-row" id="overscaleRow" style="display:none;">
           <span class="info-key">OVERSCALE</span>
           <span class="info-value" id="infoOverscale">—</span>
-          <span class="info-key" style="margin-left:4px;">CUT W/H</span>
+        </div>
+        <div class="info-row" id="overscaleCutRow" style="display:none;">
+          <span class="info-key">CUT W/H</span>
           <span class="info-value warning" id="infoOverscaleCut">—</span>
+        </div>
+        <div class="info-row" id="overscaleNativeRow" style="display:none;">
+          <span class="info-key">CUT NATIVE</span>
+          <span class="info-value warning" id="infoOverscaleNative">—</span>
         </div>
 
         <div class="info-warning" id="infoWarning"></div>
@@ -145,14 +142,51 @@
 
       <!-- Themes -->
       <div class="panel">
-        <h2 class="panel-title">▸ THEMES</h2>
+        <h2 class="panel-title">THEMES</h2>
         <div class="theme-buttons">
           <button class="theme-btn active" data-theme="default">DARK</button>
           <button class="theme-btn" data-theme="light">LIGHT</button>
         </div>
       </div>
 
+      <button class="help-btn" id="helpBtn">? HOW TO USE</button>
+
     </aside>
+
+    <!-- ── Help modal ────────────────────────────────────────────────── -->
+    <div class="modal-overlay" id="helpModal">
+      <div class="modal">
+        <div class="modal-header">
+          <span class="modal-title">HOW TO USE</span>
+          <button class="modal-close" id="helpClose">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="help-section">
+            <div class="help-section-title">EMULATION DEVICE</div>
+            <p>Enter the screen resolution of the device you are emulating on (width × height in pixels).</p>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">EMULATED CONSOLE</div>
+            <p>Select the console whose output you want to visualize. Consoles with CRT correction will offer a toggle for 4:3 aspect ratio — as they appeared on CRT televisions.</p>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">INTEGER SCALING</div>
+            <p>Scales the console output by whole numbers only (2×, 3×, 4×...). Preserves pixel sharpness. Without integer scaling, the maximum possible fill is used, which may result in a pixel imbalance (f.e. visible in Megaman games, spec. a healthbar) and will require pixe interpolation shader to alleviate it.</p>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">OVERSCALE PREVIEW</div>
+            <p>Shows what would happen at one integer step higher than what fits. The part of the console output that exceeds the screen is highlighted in red. The INFO panel shows how many pixels would be cut — both at screen resolution (CUT W/H) and at the console's native resolution (CUT NATIVE).</p>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">INFO PANEL</div>
+            <p>SCALE — the resulting scale factor. Shown in red if the console exceeds the device.<br>
+            OUTPUT — the final resolution of the console output on screen.<br>
+            COVERAGE — percentage of the screen area filled by the console output.<br>
+            BARS W/H — unused pixels on the sides / top and bottom.</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- ── Visualization ───────────────────────────────────────────────── -->
     <section class="visualization">
@@ -168,10 +202,6 @@
         <div class="legend-item">
           <div class="legend-swatch console"></div>
           <span>CONSOLE OUTPUT</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-swatch bars"></div>
-          <span>UNUSED AREA</span>
         </div>
       </div>
     </section>
