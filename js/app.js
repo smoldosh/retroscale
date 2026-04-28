@@ -37,6 +37,7 @@ const THEMES = {
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const deviceWInput       = document.getElementById("deviceW");
 const deviceHInput       = document.getElementById("deviceH");
+const deviceInchInput    = document.getElementById("deviceInch");
 const consoleSelect      = document.getElementById("consoleSelect");
 const integerScalingChk  = document.getElementById("integerScaling");
 const integerScalingLbl  = document.getElementById("integerScalingState");
@@ -56,6 +57,7 @@ const ctx                = canvas.getContext("2d");
 const infoConEl          = document.getElementById("infoCon");
 const infoScaleEl        = document.getElementById("infoScale");
 const infoFinalEl        = document.getElementById("infoFinal");
+const infoOutDiagEl      = document.getElementById("infoOutDiag");
 const infoCoverageEl     = document.getElementById("infoCoverage");
 const infoLeftoverEl        = document.getElementById("infoLeftover");
 const infoWarningEl         = document.getElementById("infoWarning");
@@ -70,6 +72,7 @@ const infoOverscaleNativeEl = document.getElementById("infoOverscaleNative");
 const state = {
   deviceW: 640,
   deviceH: 480,
+  deviceInch: null,
   consoleId: "nes",
   integerScaling: false,
   overscaling: false,
@@ -92,6 +95,14 @@ function getDisplayRes(con) {
 
 function getTheme() {
   return THEMES[state.theme] || THEMES.default;
+}
+
+// ── Output diagonal ──────────────────────────────────────────────────────
+function calcOutputDiag(outW, outH) {
+  if (!state.deviceInch || state.deviceInch <= 0) return "—";
+  const ppi  = Math.sqrt(state.deviceW ** 2 + state.deviceH ** 2) / state.deviceInch;
+  const diag = Math.sqrt(outW ** 2 + outH ** 2) / ppi;
+  return `${diag.toFixed(2)}"`;
 }
 
 // ── Scale math ────────────────────────────────────────────────────────────
@@ -259,6 +270,7 @@ function draw() {
     infoConEl.textContent      = `${conW}×${conH}`;
     infoScaleEl.textContent    = `${intScale.toFixed(3)}x`;
     infoFinalEl.textContent    = `${normalFW}×${normalFH}`;
+    infoOutDiagEl.textContent  = calcOutputDiag(normalFW, normalFH);
     infoCoverageEl.textContent = `${coverage.toFixed(1)}%`;
     infoLeftoverEl.textContent = `${devW - normalFW} / ${devH - normalFH} px`;
     infoScaleEl.classList.remove("warning");
@@ -332,6 +344,7 @@ function draw() {
   infoConEl.textContent      = `${conW}×${conH}`;
   infoScaleEl.textContent    = `${emuScale.toFixed(3)}x`;
   infoFinalEl.textContent    = `${finalW}×${finalH}`;
+  infoOutDiagEl.textContent  = calcOutputDiag(finalW, finalH);
   infoCoverageEl.textContent = `${coverage.toFixed(1)}%`;
   infoLeftoverEl.textContent = `${devW - finalW} / ${devH - finalH} px`;
 
@@ -346,7 +359,7 @@ function initDropdown() {
   categories.forEach(cat => {
     const group = document.createElement("optgroup");
     group.label = cat;
-    CONSOLES.filter(c => c.category === cat).forEach(con => {
+    CONSOLES.filter(c => c.category === cat).sort((a, b) => a.name.localeCompare(b.name)).forEach(con => {
       const opt = document.createElement("option");
       opt.value = con.id;
       opt.textContent = con.name;
@@ -403,6 +416,12 @@ deviceWInput.addEventListener("input", () => {
 
 deviceHInput.addEventListener("input", () => {
   state.deviceH = Math.max(1, parseInt(deviceHInput.value) || 1);
+  draw();
+});
+
+deviceInchInput.addEventListener("input", () => {
+  const v = parseFloat(deviceInchInput.value);
+  state.deviceInch = v > 0 ? v : null;
   draw();
 });
 
